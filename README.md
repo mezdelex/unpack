@@ -154,7 +154,7 @@ You can also use them this way if you prefer:
 - [x] Defer behavior
 - [x] Simple dependency handling
 - [x] Commands
-- [ ] UnPack auto update
-- [ ] Better error handling
+- [x] UnPack auto update
 - [ ] Tests
+- [ ] Better error handling
 - [ ] Performance improvements
