@@ -2,7 +2,7 @@
 ---@return UnPack.Spec[], string[]
 local function get_specs_and_names()
 	local config = require("config")
-	local plugin_fpaths = vim.fn.glob(config.config_path .. config.plugins_rpath .. "*.lua", true, true) ---@type string[]
+	local plugin_fpaths = vim.fn.glob(config.opts.config_path .. config.opts.plugins_rpath .. "*.lua", true, true) ---@type string[]
 	local specs, names = {}, {} ---@type UnPack.Spec[], string[]
 
 	for _, plugin_fpath in ipairs(plugin_fpaths) do
@@ -33,7 +33,7 @@ end
 ---@return string[]
 local function get_package_names()
 	local config = require("config")
-	local package_fpaths = vim.fn.glob(config.data_path .. config.packages_rpath .. "*/", false, true) ---@type string[]
+	local package_fpaths = vim.fn.glob(config.opts.data_path .. config.opts.packages_rpath .. "*/", false, true) ---@type string[]
 	local package_names = {} ---@type string[]
 
 	for _, package_fpath in ipairs(package_fpaths) do
@@ -59,7 +59,7 @@ local function handle_build(spec)
 
 	local config = require("config")
 	local package_name = vim.fn.fnamemodify(spec.src, ":t")
-	local package_fpath = config.data_path .. config.packages_rpath .. package_name ---@type string
+	local package_fpath = config.opts.data_path .. config.opts.packages_rpath .. package_name ---@type string
 	local stat = vim.uv.fs_stat(package_fpath)
 
 	if not stat or not stat.type == "directory" then
@@ -111,7 +111,7 @@ M.load = function()
 	local config = require("config")
 	local specs, _ = get_specs_and_names()
 
-	vim.pack.add(specs, config.add_options)
+	vim.pack.add(specs, config.opts.add_options)
 
 	for _, spec in ipairs(specs) do
 		if spec.config then
@@ -125,7 +125,7 @@ M.load = function()
 end
 M.pull = function()
 	local config = require("config")
-	local unpack_fpath = config.data_path .. config.unpack_rpath
+	local unpack_fpath = config.opts.data_path .. config.opts.unpack_rpath
 	local stat = vim.uv.fs_stat(unpack_fpath)
 
 	if stat and stat.type == "directory" then
@@ -135,7 +135,7 @@ end
 M.update = function()
 	local config = require("config")
 
-	vim.pack.update(nil, config.update_options)
+	vim.pack.update(nil, config.opts.update_options)
 end
 
 return M
