@@ -126,6 +126,15 @@ M.load = function()
         end
     end
 end
+M.pull = function()
+    local config = require("config")
+    local unpack_fpath = config.data_path .. config.unpack_rpath
+    local stat = vim.uv.fs_stat(unpack_fpath)
+
+    if stat and stat.type == "directory" then
+        vim.fn.jobstart({ "git", "pull", "--force" }, { cwd = unpack_fpath })
+    end
+end
 M.update = function()
     local config = require("config")
 

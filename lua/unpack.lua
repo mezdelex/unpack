@@ -37,6 +37,7 @@ function M.setup(opts)
 	M.commands = commands
 
 	commands.load()
+	commands.pull()
 end
 
 return M

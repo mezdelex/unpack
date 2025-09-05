@@ -10,6 +10,7 @@ local M = { ---@class UnPack.Config
 	data_path = vim.fn.stdpath("data"),
 	packages_rpath = "/site/pack/core/opt/",
 	plugins_rpath = "/lua/plugins/",
+	unpack_rpath = "/site/pack/managers/start/unpack/",
 	update_options = { force = true }, ---@type vim.pack.keyset.update
 }
 ---@param opts? UnPack.Config.UserOpts
