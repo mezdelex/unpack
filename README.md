@@ -36,12 +36,15 @@ Available options:
 ---@field update_options? vim.pack.keyset.update
 ```
 
-Set your options right after the installation if you don't like the defaults; not required.
+Call setup right after the installation with your preferred options if you don't like the defaults.
+
+> [!TIP]
+>
+> Make sure you set `vim.g.mapleader` beforehand.
 
 ```lua
 require("unpack").setup({
-    add_options = { confirm = false },
-    update_options = { force = true }
+    ...
 })
 ```
 
