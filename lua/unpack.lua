@@ -3,6 +3,8 @@
 ---@field defer? boolean
 ---@field dependencies? UnPack.Spec[]
 
+vim.g.is_unpack_loaded = false
+
 local M = {} ---@class UnPack
 
 ---@param opts? UnPack.Config.UserOpts
@@ -37,6 +39,8 @@ function M.setup(opts)
 	M.commands = commands
 
 	commands.load()
+
+	vim.g.is_unpack_loaded = true
 end
 
 return M

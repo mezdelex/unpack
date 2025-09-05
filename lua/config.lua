@@ -14,7 +14,11 @@ local M = { ---@class UnPack.Config
 }
 ---@param opts? UnPack.Config.UserOpts
 M.setup = function(opts)
-	M = vim.tbl_deep_extend("force", M, opts or {})
+	local merged_opts = vim.tbl_deep_extend("force", M, opts or {})
+
+	for k, v in pairs(merged_opts) do
+		M[k] = v
+	end
 end
 
 return M
