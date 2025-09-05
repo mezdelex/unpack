@@ -1,144 +1,141 @@
 ---@private
 ---@return UnPack.Spec[], string[]
 local function get_specs_and_names()
-    local config = require("config")
-    local plugin_fpaths = vim.fn.glob(config.config_path .. config.plugins_rpath .. "*.lua", true, true) ---@type string[]
-    local specs, names = {}, {} ---@type UnPack.Spec[], string[]
+	local config = require("config")
+	local plugin_fpaths = vim.fn.glob(config.config_path .. config.plugins_rpath .. "*.lua", true, true) ---@type string[]
+	local specs, names = {}, {} ---@type UnPack.Spec[], string[]
 
-    for _, plugin_fpath in ipairs(plugin_fpaths) do
-        local plugin_name = vim.fn.fnamemodify(plugin_fpath, ":t:r")
-        local success, spec = pcall(require, "plugins." .. plugin_name) ---@type boolean, UnPack.Spec
+	for _, plugin_fpath in ipairs(plugin_fpaths) do
+		local plugin_name = vim.fn.fnamemodify(plugin_fpath, ":t:r")
+		local success, spec = pcall(require, "plugins." .. plugin_name) ---@type boolean, UnPack.Spec
 
-        if not success then
-            vim.notify(
-                ("UnPack: failed to load plugin spec '%s'. Error: %s"):format(plugin_name, spec),
-                vim.log.levels.ERROR
-            )
-            goto continue_loop
-        end
+		if not success then
+			vim.notify(
+				("UnPack: failed to load plugin spec '%s'. Error: %s"):format(plugin_name, spec),
+				vim.log.levels.ERROR
+			)
+		else
+			if spec.dependencies then
+				for _, dep in ipairs(spec.dependencies) do
+					specs[#specs + 1] = dep
+					names[#names + 1] = vim.fn.fnamemodify(dep.src, ":t")
+				end
+			end
+			specs[#specs + 1] = spec
+			names[#names + 1] = vim.fn.fnamemodify(spec.src, ":t")
+		end
+	end
 
-        if spec.dependencies then
-            for _, dep in ipairs(spec.dependencies) do
-                specs[#specs + 1] = dep
-                names[#names + 1] = vim.fn.fnamemodify(dep.src, ":t")
-            end
-        end
-        specs[#specs + 1] = spec
-        names[#names + 1] = vim.fn.fnamemodify(spec.src, ":t")
-
-        ::continue_loop::
-    end
-
-    return specs, names
+	return specs, names
 end
 
 ---@private
 ---@return string[]
 local function get_package_names()
-    local config = require("config")
-    local package_fpaths = vim.fn.glob(config.data_path .. config.packages_rpath .. "*/", false, true) ---@type string[]
-    local package_names = {} ---@type string[]
+	local config = require("config")
+	local package_fpaths = vim.fn.glob(config.data_path .. config.packages_rpath .. "*/", false, true) ---@type string[]
+	local package_names = {} ---@type string[]
 
-    for _, package_fpath in ipairs(package_fpaths) do
-        local package_name = vim.fn.fnamemodify(package_fpath:sub(1, -2), ":t")
+	for _, package_fpath in ipairs(package_fpaths) do
+		local package_name = vim.fn.fnamemodify(package_fpath:sub(1, -2), ":t")
 
-        package_names[#package_names + 1] = package_name
-    end
+		package_names[#package_names + 1] = package_name
+	end
 
-    return package_names
+	return package_names
 end
 
 ---@private
 ---@param spec UnPack.Spec
 local function handle_build(spec)
-    if
-        not spec.data
-        or not spec.data.build
-        or not type(spec.data.build) == "string"
-        or spec.data.build:is_empty_or_whitespace()
-    then
-        return
-    end
+	if
+		not spec.data
+		or not spec.data.build
+		or not type(spec.data.build) == "string"
+		or spec.data.build:is_empty_or_whitespace()
+	then
+		return
+	end
 
-    local config = require("config")
-    local package_name = vim.fn.fnamemodify(spec.src, ":t")
-    local package_fpath = config.data_path .. config.packages_rpath .. package_name ---@type string
-    local stat = vim.uv.fs_stat(package_fpath)
+	local config = require("config")
+	local package_name = vim.fn.fnamemodify(spec.src, ":t")
+	local package_fpath = config.data_path .. config.packages_rpath .. package_name ---@type string
+	local stat = vim.uv.fs_stat(package_fpath)
 
-    if not stat or not stat.type == "directory" then
-        return
-    end
+	if not stat or not stat.type == "directory" then
+		return
+	end
 
-    vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
-    local response = vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }):wait()
-    vim.notify(
-        vim.trim(
-            response.stderr and not response.stderr:is_empty_or_whitespace() and response.stderr
-            or response.stdout and not response.stdout:is_empty_or_whitespace() and response.stdout
-            or ("Exit code: %d"):format(response.code)
-        ),
-        response.code ~= 0 and vim.log.levels.ERROR or vim.log.levels.INFO
-    )
+	vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
+	local response = vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }):wait()
+	vim.notify(
+		vim.trim(
+			response.stderr and not response.stderr:is_empty_or_whitespace() and response.stderr
+				or response.stdout and not response.stdout:is_empty_or_whitespace() and response.stdout
+				or ("Exit code: %d"):format(response.code)
+		),
+		response.code ~= 0 and vim.log.levels.ERROR or vim.log.levels.INFO
+	)
 end
 
 local M = {} ---@class UnPack.Commands
 
 ---@param specs? UnPack.Spec[]
 M.build = function(specs)
-    if not specs or #specs == 0 then
-        specs, _ = get_specs_and_names()
-    end
+	if not specs or #specs == 0 then
+		specs, _ = get_specs_and_names()
+	end
 
-    for _, spec in ipairs(specs) do
-        handle_build(spec)
-    end
+	for _, spec in ipairs(specs) do
+		handle_build(spec)
+	end
 end
 M.clean = function()
-    local _, names = get_specs_and_names()
-    local package_names = get_package_names()
-    local names_set, packages_to_delete = {}, {} ---@type table<string, boolean>, string[]
+	local _, names = get_specs_and_names()
+	local package_names = get_package_names()
+	local names_set, packages_to_delete = {}, {} ---@type table<string, boolean>, string[]
 
-    for _, name in ipairs(names) do
-        names_set[name] = true
-    end
+	for _, name in ipairs(names) do
+		names_set[name] = true
+	end
 
-    for _, package_name in ipairs(package_names) do
-        if not names_set[package_name] then
-            packages_to_delete[#packages_to_delete + 1] = package_name
-        end
-    end
+	for _, package_name in ipairs(package_names) do
+		if not names_set[package_name] then
+			packages_to_delete[#packages_to_delete + 1] = package_name
+		end
+	end
 
-    vim.pack.del(packages_to_delete)
+	vim.pack.del(packages_to_delete)
 end
 M.load = function()
-    local config = require("config")
-    local specs, _ = get_specs_and_names()
+	local config = require("config")
+	local specs, _ = get_specs_and_names()
 
-    vim.pack.add(specs, config.add_options)
+	vim.pack.add(specs, config.add_options)
 
-    for _, spec in ipairs(specs) do
-        if spec.config then
-            if spec.defer then
-                vim.schedule(spec.config)
-            else
-                spec.config()
-            end
-        end
-    end
+	for _, spec in ipairs(specs) do
+		if spec.config then
+			if spec.defer then
+				vim.schedule(spec.config)
+			else
+				spec.config()
+			end
+		end
+	end
 end
 M.pull = function()
-    local config = require("config")
-    local unpack_fpath = config.data_path .. config.unpack_rpath
-    local stat = vim.uv.fs_stat(unpack_fpath)
+	local config = require("config")
+	local unpack_fpath = config.data_path .. config.unpack_rpath
+	local stat = vim.uv.fs_stat(unpack_fpath)
 
-    if stat and stat.type == "directory" then
-        vim.fn.jobstart({ "git", "pull", "--force" }, { cwd = unpack_fpath })
-    end
+	if stat and stat.type == "directory" then
+		vim.fn.jobstart({ "git", "pull", "--force" }, { cwd = unpack_fpath })
+	end
 end
 M.update = function()
-    local config = require("config")
+	local config = require("config")
 
-    vim.pack.update(nil, config.update_options)
+	vim.pack.update(nil, config.update_options)
 end
 
 return M
