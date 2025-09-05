@@ -72,11 +72,11 @@ local function handle_build(spec)
     vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
     local response = vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }):wait()
     vim.notify(
-        (
+        vim.trim(
             response.stderr and not response.stderr:is_empty_or_whitespace() and response.stderr
             or response.stdout and not response.stdout:is_empty_or_whitespace() and response.stdout
             or ("Exit code: %d"):format(response.code)
-        ):trim(),
+        ),
         response.code ~= 0 and vim.log.levels.ERROR or vim.log.levels.INFO
     )
 end
