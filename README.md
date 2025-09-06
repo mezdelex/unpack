@@ -1,3 +1,7 @@
+
+<p align="center"><img width="761" height="713" alt="image" src="https://github.com/user-attachments/assets/0eb27f2b-835e-4b22-b25c-80a60f99a82e" /></p>
+
+
 # UnPack
 
 A minimal layer on top of `vim.pack` API to allow single file plugin configurations.
