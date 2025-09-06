@@ -1,52 +1,8 @@
+---@diagnostic disable: duplicate-set-field
 local assert = require("luassert")
 local commands = require("lua.commands")
 
-_G.vim = {
-	uv = {
-		fs_stat = function()
-			return nil
-		end,
-	},
-	fn = {
-		glob = function()
-			return {}
-		end,
-		fnamemodify = function(fpath, modifier)
-			if modifier == ":t" then
-				return fpath:match("([^/]+)$")
-			end
-			if modifier == ":t:r" then
-				return fpath:match("([^/]+)%.lua$")
-			end
-			return fpath
-		end,
-		jobstart = function() end,
-	},
-	notify = function() end,
-	pack = { del = function() end, add = function() end, update = function() end },
-	system = function()
-		return {
-			wait = function()
-				return { code = 0, stdout = "" }
-			end,
-		}
-	end,
-	log = { levels = { INFO = 1, WARN = 2, ERROR = 3 } },
-	schedule = function(f)
-		f()
-	end,
-	split = function(s)
-		local t = {}
-		for w in s:gmatch("%S+") do
-			t[#t + 1] = w
-		end
-		return t
-	end,
-	trim = function(s)
-		return (s:gsub("^%s*(.-)%s*$", "%1"))
-	end,
-}
-
+_G.vim = require("test.fixtures").commands_fixtures
 _G.string.is_empty_or_whitespace = function(s)
 	return not not s:match("^%s*$")
 end
@@ -148,7 +104,7 @@ describe("commands", function()
 			vim.fn.glob = function()
 				return { "/tmp/config/plugins/a.lua" }
 			end
-			vim.fn.fnamemodify = function(_, m)
+			vim.fn.fnamemodify = function(_, _)
 				return "a"
 			end
 			local added
@@ -172,7 +128,7 @@ describe("commands", function()
 			vim.fn.glob = function()
 				return { "/tmp/config/plugins/b.lua" }
 			end
-			vim.fn.fnamemodify = function(_, m)
+			vim.fn.fnamemodify = function(_, _)
 				return "b"
 			end
 			local scheduled
