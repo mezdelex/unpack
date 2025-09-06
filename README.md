@@ -1,16 +1,12 @@
-
-<p align="center"><img width="761" height="713" alt="image" src="https://github.com/user-attachments/assets/0eb27f2b-835e-4b22-b25c-80a60f99a82e" /></p>
-
-
-# UnPack
-
-A minimal layer on top of `vim.pack` API to allow single file plugin configurations.
+<p align="center"><img src="https://github.com/user-attachments/assets/0eb27f2b-835e-4b22-b25c-80a60f99a82e" width="200" height="200"></p>
+<p align="center">A minimal layer on top of <code>vim.pack</code> API to allow single file plugin configurations.</p>
+<br>
 
 > [!IMPORTANT]
 >
-> This is a layer on top of `vim.pack` under the `neovim-nightly` branch, so changes are to be expected.
+> `vim.pack` is currently under development in the `neovim-nightly` branch.
 
-## UnPack.Installation
+## Installation
 
 Add these lines to your init.lua:
 
@@ -28,7 +24,7 @@ if not vim.uv.fs_stat(unpack_path) then
 end
 ```
 
-## UnPack.Setup
+## Setup
 
 Available options:
 
@@ -55,7 +51,7 @@ require("unpack").setup({
 Defaults are set with minimal interaction in mind. If you want to be notified about all the changes, set `confirm` to true and `force` to false.
 See `:h vim.pack`
 
-## UnPack.Spec
+## Spec
 
 This layer extends `vim.pack.Spec` to allow single file configurations.
 
@@ -134,7 +130,7 @@ Every spec marked with `defer = true` is going to be deferred using `vim.schedul
 The dependencies handling logic is pretty simple: the plugins are going to be loaded in order, so make sure to add the dependencies in order too.
 For example, if any of your plugins relies on `plenary` as a dependency, add it in the first plugin that requires it following your `plugins` directory name order, and that's pretty much it.
 
-## UnPack.Commands
+## Commands
 
 The commands provided are:
 
