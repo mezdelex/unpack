@@ -132,10 +132,12 @@ For example, if any of your plugins relies on `plenary` as a dependency, add it 
 
 ## UnPack.Commands
 
-The commands provided are these 3:
+The commands provided are:
 
 - PackBuild: iterates over all the plugin specs and runs all the build hooks. _(This command is triggered automatically on `PackChanged` event per changed package as well)_
 - PackClean: it removes any plugin present in your packages directory that doesn't exist as a plugin spec.
+- PackLoad: it loads all the plugins in your `plugins` directory. _(This command is executed when you enter Neovim; exposed just in case any of your builds times out and you need to reload)_
+- PackPull: updates UnPack to the latest version. _(This command also runs when you enter Neovim; calls `vim.fn.jobstart` to pull for changes)_
 - PackUpdate: it updates all the plugins present in your packages directory (already loaded).
 
 You can also use them this way if you prefer:
@@ -145,6 +147,8 @@ You can also use them this way if you prefer:
 
     vim.keymap.set("n", "<your-keymap>", commands.build)
     vim.keymap.set("n", "<your-keymap>", commands.clean)
+    vim.keymap.set("n", "<your-keymap>", commands.load)
+    vim.keymap.set("n", "<your-keymap>", commands.pull)
     vim.keymap.set("n", "<your-keymap>", commands.update)
 ```
 
