@@ -144,26 +144,35 @@ describe("commands", function()
 
 	describe("pull", function()
 		it("pulls if unpack dir exists", function()
-			local called
+			local calls = {}
 			vim.uv.fs_stat = function()
 				return { type = "directory" }
 			end
-			vim.fn.jobstart = function(cmd, opts)
-				called = { cmd = cmd, opts = opts }
+			vim.system = function(cmd, opts, cb)
+				table.insert(calls, { cmd = cmd, opts = opts })
+				if cb then
+					cb()
+				end
 			end
+
 			commands.pull()
-			assert.same({ "git", "pull", "--force" }, called.cmd)
-			assert.same({ cwd = "/tmp/data/unpack/" }, called.opts)
+
+			assert.same({ "git", "reset", "--hard", "HEAD" }, calls[1].cmd)
+			assert.same({ cwd = "/tmp/data/unpack/" }, calls[1].opts)
+
+			assert.same({ "git", "pull", "--force" }, calls[2].cmd)
+			assert.same({ cwd = "/tmp/data/unpack/" }, calls[2].opts)
 		end)
 
 		it("does nothing if unpack dir missing", function()
 			local called = false
 			vim.uv.fs_stat = function()
-				return {}
+				return nil
 			end
-			vim.fn.jobstart = function()
+			vim.system = function()
 				called = true
 			end
+
 			commands.pull()
 			assert.False(called)
 		end)

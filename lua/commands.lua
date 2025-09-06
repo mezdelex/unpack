@@ -134,7 +134,7 @@ M.load = function()
 	vim.pack.add(specs, config.opts.add_options)
 
 	for _, spec in ipairs(specs) do
-		if spec.config then
+		if spec.config and type(spec.config) == "function" then
 			if spec.defer then
 				vim.schedule(spec.config)
 			else
