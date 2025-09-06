@@ -10,10 +10,7 @@ local function get_specs_and_names()
 		local success, spec = pcall(require, "plugins." .. plugin_name) ---@type boolean, UnPack.Spec
 
 		if not success then
-			vim.notify(
-				("UnPack: failed to load plugin spec '%s'. Error: %s"):format(plugin_name, spec),
-				vim.log.levels.ERROR
-			)
+			vim.notify(("Failed to load plugin spec for %s"):format(plugin_name), vim.log.levels.ERROR)
 		else
 			if spec.dependencies then
 				for _, dep in ipairs(spec.dependencies) do
