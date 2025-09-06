@@ -1,4 +1,4 @@
-local assert = require("luarocks.busted.assert")
+local assert = require("luassert")
 local commands = require("commands")
 
 describe("commands", function()
