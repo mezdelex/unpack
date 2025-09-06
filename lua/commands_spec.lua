@@ -195,19 +195,30 @@ describe("commands", function()
                 return {}
             end
 
+            _G.vim.fn.glob = function(pattern, ...)
+                if pattern:match("plugins/%.lua") then
+                    return { "/tmp/config/plugins/plugin1.lua", "/tmp/config/plugins/plugin2.lua" }
+                elseif pattern:match("packages/%*/") then
+                    return { "/tmp/data/packages/plugin1/", "/tmp/data/packages/plugin3/" }
+                end
+                return {}
+            end
+
             _G.vim.fn.fnamemodify = function(fpath, modifier)
+                if not fpath then
+                    return nil
+                end
                 if modifier == ":t:r" then
-                    if fpath == "/tmp/config/plugins/plugin1.lua" then
-                        return "plugin1"
-                    elseif fpath == "/tmp/config/plugins/plugin2.lua" then
-                        return "plugin2"
-                    end
+                    return fpath:match("([^/%.]+)%.lua$") or fpath
                 elseif modifier == ":t" then
-                    -- Handle paths like "/tmp/data/packages/plugin1" (no trailing slash)
-                    return fpath:match("([^/]+)[/]*$") or fpath
+                    local name = fpath:match("([^/]+)[/]*$") or fpath
+                    return name:gsub("%.lua$", "")
                 end
                 return fpath
             end
+
+            _G.package.loaded["plugins.plugin1"] = { src = "plugin1" }
+            _G.package.loaded["plugins.plugin2"] = { src = "plugin2" }
 
             package.loaded["plugins.plugin1"] = { src = "plugin1" }
             package.loaded["plugins.plugin2"] = { src = "plugin2" }
@@ -217,7 +228,7 @@ describe("commands", function()
                 init = function() end,
             }
 
-            vim.pack.del = function(packages)
+            _G.vim.pack.del = function(packages)
                 pack_del_called_with = packages
             end
 
@@ -245,13 +256,19 @@ describe("commands", function()
                 return {}
             end
 
+            _G.vim.fn.glob = function(pattern, ...)
+                if pattern:match("plugins/%.lua") then
+                    return { "/tmp/config/plugins/pluginA.lua", "/tmp/config/plugins/pluginB.lua" }
+                end
+                return {}
+            end
+
             _G.vim.fn.fnamemodify = function(fpath, modifier)
+                if not fpath then
+                    return nil
+                end
                 if modifier == ":t:r" then
-                    if fpath == "/tmp/config/plugins/pluginA.lua" then
-                        return "pluginA"
-                    elseif fpath == "/tmp/config/plugins/pluginB.lua" then
-                        return "pluginB"
-                    end
+                    return fpath:match("([^/%.]+)%.lua$") or fpath
                 elseif modifier == ":t" then
                     return fpath:match("([^/]+)[/]*$") or fpath
                 end
@@ -272,7 +289,7 @@ describe("commands", function()
                 defer = true,
             }
 
-            vim.pack.add = function(specs, options)
+            _G.vim.pack.add = function(specs, options)
                 pack_add_called_with_specs = specs
                 pack_add_called_with_options = options
             end
@@ -285,8 +302,8 @@ describe("commands", function()
             assert.True(defer_config_executed)
 
             package.loaded["plugins.pluginA"] = nil
-            package.loaded["plugins.pluginB"] = nil
-            package.loaded["unpack"] = nil
+            _G.package.loaded["plugins.pluginB"] = nil
+            _G.package.loaded["unpack"] = nil
         end)
     end)
 
@@ -295,7 +312,7 @@ describe("commands", function()
             local pack_update_called = false
             local update_options = nil
 
-            vim.pack.update = function(_, options)
+            _G.vim.pack.update = function(_, options)
                 pack_update_called = true
                 update_options = options
             end
@@ -312,14 +329,14 @@ describe("commands", function()
             local system_called = false
             local notify_messages = {}
 
-            vim.uv.fs_stat = function(fpath)
+            _G.vim.uv.fs_stat = function(fpath)
                 if fpath == "/tmp/data/packages/test-plugin" then
                     return { type = "directory" }
                 end
                 return nil
             end
 
-            vim.system = function(cmd, opts)
+            _G.vim.system = function(cmd, opts)
                 system_called = true
                 assert.are.same({ "make", "install" }, cmd)
                 assert.are.same({ cwd = "/tmp/data/packages/test-plugin" }, opts)
@@ -330,7 +347,7 @@ describe("commands", function()
                 }
             end
 
-            vim.notify = function(message, level)
+            _G.vim.notify = function(message, level)
                 table.insert(notify_messages, { message, level })
             end
 
@@ -350,7 +367,7 @@ describe("commands", function()
         it("should not build if no build command is specified", function()
             local system_called = false
 
-            vim.system = function()
+            _G.vim.system = function()
                 system_called = true
             end
 
@@ -372,7 +389,7 @@ describe("commands", function()
                 return nil
             end
 
-            vim.system = function(cmd, opts)
+            _G.vim.system = function(cmd, opts)
                 return {
                     wait = function()
                         return { code = 1, stderr = "Build failed" }
@@ -380,7 +397,7 @@ describe("commands", function()
                 }
             end
 
-            vim.notify = function(message, level)
+            _G.vim.notify = function(message, level)
                 table.insert(notify_messages, { message, level })
             end
 
@@ -397,7 +414,7 @@ describe("commands", function()
         it("should get specs and names if no specs are provided", function()
             local get_specs_and_names_called = false
 
-            vim.fn.glob = function(pattern, ...)
+            _G.vim.fn.glob = function(pattern, ...)
                 get_specs_and_names_called = true
                 if pattern:match("plugins/%.lua") then
                     return {}
