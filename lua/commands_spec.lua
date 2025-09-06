@@ -10,6 +10,15 @@ _G.vim = _G.vim
                 return {}
             end,
             fnamemodify = function(fpath, modifier)
+                if not fpath then
+                    return nil
+                end
+                local fname = fpath:match("([^/]+)[/]*$") or fpath
+                if modifier == ":t" then
+                    return fname
+                elseif modifier == ":t:r" then
+                    return fname:match("^(.*)%.[^.]+") or fname
+                end
                 return fpath
             end,
             jobstart = function() end,
@@ -85,16 +94,16 @@ describe("commands", function()
         _G.string.is_empty_or_whitespace = function(s)
             return not not s:match("^%s*$")
         end
-        vim.uv.fs_stat = function() end
-        vim.fn.jobstart = function() end
-        vim.notify = function() end
-        vim.pack.del = function() end
-        vim.pack.add = function() end
-        vim.pack.update = function() end
-        vim.system = function() end
-        vim.fn.glob = function() end
-        vim.fn.fnamemodify = function() end
-        vim.schedule = function(f)
+        _G.vim.uv.fs_stat = function() end
+        _G.vim.fn.jobstart = function() end
+        _G.vim.notify = function() end
+        _G.vim.pack.del = function() end
+        _G.vim.pack.add = function() end
+        _G.vim.pack.update = function() end
+        _G.vim.system = function() end
+        _G.vim.fn.glob = function() end
+        _G.vim.fn.fnamemodify = function() end
+        _G.vim.schedule = function(f)
             f()
         end
         package.loaded["config"] = {
@@ -108,32 +117,32 @@ describe("commands", function()
                 update_options = {},
             },
         }
-        vim.split = function(s, sep)
+        _G.vim.split = function(s, sep)
             local t = {}
             for word in s:gmatch("%S+") do
                 table.insert(t, word)
             end
             return t
         end
-        vim.trim = function(s)
+        _G.vim.trim = function(s)
             return s:match("^%s*(.*%S?)%s*$")
         end
     end)
 
     after_each(function()
-        vim.uv.fs_stat = uv_fs_stat_original
-        vim.fn.jobstart = fn_jobstart_original
-        vim.notify = notify_original
-        vim.pack.del = pack_del_original
-        vim.pack.add = pack_add_original
-        vim.pack.update = pack_update_original
-        vim.system = system_original
-        vim.fn.glob = fn_glob_original
-        vim.fn.fnamemodify = fn_fnamemodify_original
-        vim.schedule = schedule_original
-        vim.split = split_original
-        vim.trim = trim_original
-        string.is_empty_or_whitespace = is_empty_or_whitespace_original
+        _G.vim.uv.fs_stat = uv_fs_stat_original
+        _G.vim.fn.jobstart = fn_jobstart_original
+        _G.vim.notify = notify_original
+        _G.vim.pack.del = pack_del_original
+        _G.vim.pack.add = pack_add_original
+        _G.vim.pack.update = pack_update_original
+        _G.vim.system = system_original
+        _G.vim.fn.glob = fn_glob_original
+        _G.vim.fn.fnamemodify = fn_fnamemodify_original
+        _G.vim.schedule = schedule_original
+        _G.vim.split = split_original
+        _G.vim.trim = trim_original
+        _G.string.is_empty_or_whitespace = is_empty_or_whitespace_original
 
         package.loaded["config"] = nil
     end)
@@ -177,7 +186,7 @@ describe("commands", function()
         it("should delete packages that are not in specs", function()
             local pack_del_called_with = nil
 
-            vim.fn.glob = function(pattern, ...) -- Mock vim.fn.glob
+            vim.fn.glob = function(pattern, ...)
                 if pattern:match("plugins/%.lua") then
                     return { "/tmp/config/plugins/plugin1.lua", "/tmp/config/plugins/plugin2.lua" }
                 elseif pattern:match("packages/%*/") then
@@ -186,25 +195,23 @@ describe("commands", function()
                 return {}
             end
 
-            vim.fn.fnamemodify = function(fpath, modifier) -- Mock vim.fn.fnamemodify
+            _G.vim.fn.fnamemodify = function(fpath, modifier)
                 if modifier == ":t:r" then
                     if fpath == "/tmp/config/plugins/plugin1.lua" then
                         return "plugin1"
                     elseif fpath == "/tmp/config/plugins/plugin2.lua" then
                         return "plugin2"
                     end
-                elseif modifier == ":t" and fpath:match("packages/%a+/$") then
-                    return fpath:match("packages/(%a+)/$")
-                elseif modifier == ":t" and fpath:match("plugin%d") then
-                    return fpath
+                elseif modifier == ":t" then
+                    -- Handle paths like "/tmp/data/packages/plugin1" (no trailing slash)
+                    return fpath:match("([^/]+)[/]*$") or fpath
                 end
                 return fpath
             end
 
-            package.loaded["plugins.plugin1"] = { src = "plugin1" } -- Only src is needed for the clean command.
-            package.loaded["plugins.plugin2"] = { src = "plugin2" } -- Only src is needed for the clean command.
+            package.loaded["plugins.plugin1"] = { src = "plugin1" }
+            package.loaded["plugins.plugin2"] = { src = "plugin2" }
 
-            -- Mock unpack module
             package.loaded["unpack"] = {
                 Spec = {},
                 init = function() end,
@@ -231,14 +238,14 @@ describe("commands", function()
             local config_executed = false
             local defer_config_executed = false
 
-            vim.fn.glob = function(pattern, ...) -- Mock vim.fn.glob
+            vim.fn.glob = function(pattern, ...)
                 if pattern:match("plugins/%.lua") then
                     return { "/tmp/config/plugins/pluginA.lua", "/tmp/config/plugins/pluginB.lua" }
                 end
                 return {}
             end
 
-            vim.fn.fnamemodify = function(fpath, modifier) -- Mock vim.fn.fnamemodify
+            _G.vim.fn.fnamemodify = function(fpath, modifier)
                 if modifier == ":t:r" then
                     if fpath == "/tmp/config/plugins/pluginA.lua" then
                         return "pluginA"
@@ -246,7 +253,7 @@ describe("commands", function()
                         return "pluginB"
                     end
                 elseif modifier == ":t" then
-                    return fpath -- Mock for spec.src
+                    return fpath:match("([^/]+)[/]*$") or fpath
                 end
                 return fpath
             end
@@ -365,7 +372,7 @@ describe("commands", function()
                 return nil
             end
 
-            vim.system = function(cmd, opts) -- Mock vim.system
+            vim.system = function(cmd, opts)
                 return {
                     wait = function()
                         return { code = 1, stderr = "Build failed" }
@@ -373,7 +380,7 @@ describe("commands", function()
                 }
             end
 
-            vim.notify = function(message, level) -- Mock vim.notify
+            vim.notify = function(message, level)
                 table.insert(notify_messages, { message, level })
             end
 
@@ -390,7 +397,7 @@ describe("commands", function()
         it("should get specs and names if no specs are provided", function()
             local get_specs_and_names_called = false
 
-            vim.fn.glob = function(pattern, ...) -- Mock vim.fn.glob
+            vim.fn.glob = function(pattern, ...)
                 get_specs_and_names_called = true
                 if pattern:match("plugins/%.lua") then
                     return {}
