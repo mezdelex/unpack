@@ -149,7 +149,9 @@ M.pull = function()
 	local stat = vim.uv.fs_stat(unpack_fpath)
 
 	if stat and stat.type == "directory" then
-		vim.fn.jobstart({ "git", "pull", "--force" }, { cwd = unpack_fpath })
+		vim.system({ "git", "reset", "--hard", "HEAD" }, { cwd = unpack_fpath }, function()
+			vim.system({ "git", "pull", "--force" }, { cwd = unpack_fpath }, function() end)
+		end)
 	end
 end
 M.update = function()
