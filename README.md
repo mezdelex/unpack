@@ -160,5 +160,9 @@ You can also use them this way if you prefer:
 - [x] Commands
 - [x] UnPack auto update
 - [x] Tests
+  - [x] commands
+  - [ ] config
+  - [ ] extensions
+  - [ ] unpack
 - [ ] Better error handling
 - [ ] Performance improvements

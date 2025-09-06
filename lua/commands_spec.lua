@@ -1,10 +1,55 @@
-vim = vim or {}
-vim.uv = vim.uv or {}
-vim.fn = vim.fn or {}
-vim.notify = vim.notify or {}
-vim.pack = vim.pack or {}
-vim.system = vim.system or {}
-vim.log = vim.log or { levels = {} }
+_G.vim = _G.vim
+    or {
+        uv = {
+            fs_stat = function()
+                return nil
+            end,
+        },
+        fn = {
+            glob = function()
+                return {}
+            end,
+            fnamemodify = function(fpath, modifier)
+                return fpath
+            end,
+            jobstart = function() end,
+        },
+        notify = function() end,
+        pack = {
+            del = function() end,
+            add = function() end,
+            update = function() end,
+        },
+        system = function()
+            return {
+                wait = function()
+                    return { code = 0, stdout = "" }
+                end,
+            }
+        end,
+        log = {
+            levels = {
+                INFO = 1,
+                WARN = 2,
+                ERROR = 3,
+            },
+        },
+        schedule = function(f)
+            f()
+        end,
+        split = function(s, sep)
+            return {}
+        end,
+        trim = function(s)
+            return s
+        end,
+    }
+
+_G.string = _G.string or {}
+_G.string.is_empty_or_whitespace = _G.string.is_empty_or_whitespace or function(s)
+    return not not s:match("^%s*$")
+end
+
 local assert = require("luassert")
 local commands = require("commands")
 
@@ -24,20 +69,20 @@ describe("commands", function()
     local is_empty_or_whitespace_original
 
     before_each(function()
-        uv_fs_stat_original = vim.uv.fs_stat
-        fn_jobstart_original = vim.fn.jobstart
-        notify_original = vim.notify
-        pack_del_original = vim.pack.del
-        pack_add_original = vim.pack.add
-        pack_update_original = vim.pack.update
-        system_original = vim.system
-        fn_glob_original = vim.fn.glob
-        fn_fnamemodify_original = vim.fn.fnamemodify
-        schedule_original = vim.schedule
-        split_original = vim.split
-        trim_original = vim.trim
-        is_empty_or_whitespace_original = string.is_empty_or_whitespace
-        string.is_empty_or_whitespace = function(s)
+        uv_fs_stat_original = _G.vim.uv.fs_stat
+        fn_jobstart_original = _G.vim.fn.jobstart
+        notify_original = _G.vim.notify
+        pack_del_original = _G.vim.pack.del
+        pack_add_original = _G.vim.pack.add
+        pack_update_original = _G.vim.pack.update
+        system_original = _G.vim.system
+        fn_glob_original = _G.vim.fn.glob
+        fn_fnamemodify_original = _G.vim.fn.fnamemodify
+        schedule_original = _G.vim.schedule
+        split_original = _G.vim.split
+        trim_original = _G.vim.trim
+        is_empty_or_whitespace_original = _G.string.is_empty_or_whitespace
+        _G.string.is_empty_or_whitespace = function(s)
             return not not s:match("^%s*$")
         end
         vim.uv.fs_stat = function() end
