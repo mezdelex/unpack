@@ -30,5 +30,8 @@ jobs:
       - name: Run tests
         run: |
           export PATH=$HOME/.luarocks/bin:$PATH
-          export LUA_PATH="./lua_modules/?.lua;./lua_modules/?/init.lua;$LUA_PATH"
+          echo "LUA_PATH before nvim: $LUA_PATH"
+          echo "Listing contents of $HOME/.luarocks/share/lua/5.1/:",
+          ls -R $HOME/.luarocks/share/lua/5.1/
+          export LUA_PATH="$HOME/.luarocks/share/lua/5.1/?.lua;$HOME/.luarocks/share/lua/5.1/?/init.lua;./lua_modules/?.lua;./lua_modules/?/init.lua;$LUA_PATH" # This line is intentionally after diagnostics, as we still need to set it for the tests.
           nvim --headless -c "!busted --verbose ." -c "qa!"
