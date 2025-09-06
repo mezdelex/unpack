@@ -164,5 +164,5 @@ You can also use them this way if you prefer:
   - [x] config
   - [x] extensions
   - [x] unpack
-- [ ] Better error handling
+- [x] Better error handling
 - [ ] Performance improvements
