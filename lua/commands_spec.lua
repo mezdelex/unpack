@@ -1,4 +1,10 @@
 vim = vim or {}
+vim.uv = vim.uv or {}
+vim.fn = vim.fn or {}
+vim.notify = vim.notify or {}
+vim.pack = vim.pack or {}
+vim.system = vim.system or {}
+vim.log = vim.log or { levels = {} }
 local assert = require("luassert")
 local commands = require("commands")
 
