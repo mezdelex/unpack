@@ -13,7 +13,7 @@ local function get_specs_and_names()
 			vim.notify(("Failed to load plugin spec for %s"):format(plugin_name), vim.log.levels.ERROR)
 		else
 			if type(spec) ~= "table" then
-				vim.notify(("Invalid spec for %s"):format(plugin_name), vim.log.levels.ERROR)
+				vim.notify(("Invalid spec for %s, not a table"):format(plugin_name), vim.log.levels.ERROR)
 			else
 				if spec.dependencies and type(spec.dependencies) == "table" then
 					for _, dep in ipairs(spec.dependencies) do
@@ -21,7 +21,10 @@ local function get_specs_and_names()
 							specs[#specs + 1] = dep
 							names[#names + 1] = vim.fn.fnamemodify(dep.src, ":t")
 						else
-							vim.notify(("Invalid dependency for %s"):format(plugin_name), vim.log.levels.WARN)
+							vim.notify(
+								("Invalid dependency for %s, missing src"):format(plugin_name),
+								vim.log.levels.ERROR
+							)
 						end
 					end
 				end
@@ -29,7 +32,7 @@ local function get_specs_and_names()
 					specs[#specs + 1] = spec
 					names[#names + 1] = vim.fn.fnamemodify(spec.src, ":t")
 				else
-					vim.notify(("Spec %s missing src"):format(plugin_name), vim.log.levels.ERROR)
+					vim.notify(("Invalid spec for %s, missing src"):format(plugin_name), vim.log.levels.ERROR)
 				end
 			end
 		end
