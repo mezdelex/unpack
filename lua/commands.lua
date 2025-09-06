@@ -12,14 +12,26 @@ local function get_specs_and_names()
 		if not success then
 			vim.notify(("Failed to load plugin spec for %s"):format(plugin_name), vim.log.levels.ERROR)
 		else
-			if spec.dependencies then
-				for _, dep in ipairs(spec.dependencies) do
-					specs[#specs + 1] = dep
-					names[#names + 1] = vim.fn.fnamemodify(dep.src, ":t")
+			if type(spec) ~= "table" then
+				vim.notify(("Invalid spec for %s"):format(plugin_name), vim.log.levels.ERROR)
+			else
+				if spec.dependencies and type(spec.dependencies) == "table" then
+					for _, dep in ipairs(spec.dependencies) do
+						if dep.src and type(dep.src) == "string" then
+							specs[#specs + 1] = dep
+							names[#names + 1] = vim.fn.fnamemodify(dep.src, ":t")
+						else
+							vim.notify(("Invalid dependency for %s"):format(plugin_name), vim.log.levels.WARN)
+						end
+					end
+				end
+				if spec.src and type(spec.src) == "string" then
+					specs[#specs + 1] = spec
+					names[#names + 1] = vim.fn.fnamemodify(spec.src, ":t")
+				else
+					vim.notify(("Spec %s missing src"):format(plugin_name), vim.log.levels.ERROR)
 				end
 			end
-			specs[#specs + 1] = spec
-			names[#names + 1] = vim.fn.fnamemodify(spec.src, ":t")
 		end
 	end
 
@@ -46,10 +58,9 @@ end
 ---@param spec UnPack.Spec
 local function handle_build(spec)
 	if
-		not spec.src
-		or not spec.data
-		or not spec.data.build
-		or not type(spec.data.build) == "string"
+		type(spec.src) ~= "string"
+		or type(spec.data) ~= "table"
+		or type(spec.data.build) ~= "string"
 		or spec.data.build:is_empty_or_whitespace()
 	then
 		return
@@ -60,12 +71,20 @@ local function handle_build(spec)
 	local package_fpath = config.opts.data_path .. config.opts.packages_rpath .. package_name ---@type string
 	local stat = vim.uv.fs_stat(package_fpath)
 
-	if not stat or not stat.type == "directory" then
+	if not stat or stat.type ~= "directory" then
 		return
 	end
 
 	vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
-	local response = vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }):wait()
+
+	local success, response = pcall(function()
+		return vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }):wait()
+	end)
+	if not success then
+		vim.notify(("Failed to run build for %s"):format(package_name), vim.log.levels.ERROR)
+		return
+	end
+
 	vim.notify(
 		vim.trim(
 			response.stderr and not response.stderr:is_empty_or_whitespace() and response.stderr
