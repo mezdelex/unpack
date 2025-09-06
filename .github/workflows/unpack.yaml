@@ -1,4 +1,4 @@
-name: Unpack and Test Neovim Plugins
+name: UnPack CI
 
 on:
   push:
