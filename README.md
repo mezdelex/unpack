@@ -159,6 +159,10 @@ You can also use them this way if you prefer:
 - [x] Simple dependency handling
 - [x] Commands
 - [x] UnPack auto update
-- [ ] Tests
+- [x] Tests
+  - [x] commands
+  - [ ] config
+  - [ ] extensions
+  - [ ] unpack
 - [ ] Better error handling
 - [ ] Performance improvements

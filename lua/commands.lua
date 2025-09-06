@@ -46,7 +46,8 @@ end
 ---@param spec UnPack.Spec
 local function handle_build(spec)
 	if
-		not spec.data
+		not spec.src
+		or not spec.data
 		or not spec.data.build
 		or not type(spec.data.build) == "string"
 		or spec.data.build:is_empty_or_whitespace()

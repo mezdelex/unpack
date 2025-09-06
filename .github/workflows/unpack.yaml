@@ -28,4 +28,7 @@ jobs:
         run: luarocks install busted --local
 
       - name: Run tests
-        run: nvim --headless -c "silent !busted --verbose --lua=./lua_modules --lua-version=5.1 ." -c "qa!"
+        run: |
+          export PATH=$HOME/.luarocks/bin:$PATH
+          export LUA_PATH="?.lua;?/init.lua;./lua/?.lua;./lua/?/init.lua;$HOME/.luarocks/share/lua/5.1/?.lua;$HOME/.luarocks/share/lua/5.1/?/init.lua;./lua_modules/?.lua;./lua_modules/?/init.lua;$LUA_PATH"
+          nvim --headless -c "!busted --verbose ." -c "qa!"
