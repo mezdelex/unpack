@@ -159,6 +159,6 @@ You can also use them this way if you prefer:
 - [x] Simple dependency handling
 - [x] Commands
 - [x] UnPack auto update
-- [-] Tests
+- [x] Tests
 - [ ] Better error handling
 - [ ] Performance improvements
