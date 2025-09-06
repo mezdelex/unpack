@@ -26,21 +26,19 @@ describe("commands", function()
 			vim.uv.fs_stat = function()
 				return { type = "directory" }
 			end
-			vim.system = function(cmd, o)
-				assert.same({ "make", "install" }, cmd)
-				assert.same({ cwd = "/tmp/data/packages/test" }, o)
-				return {
-					wait = function()
-						return { code = 0, stdout = "ok" }
-					end,
-				}
+			vim.notify = function(msg, level)
+				msgs[#msgs + 1] = { msg, level }
 			end
-			vim.notify = function(m, l)
-				msgs[#msgs + 1] = { m, l }
+			vim.system = function(cmd, opts, callback)
+				assert.same({ "make", "install" }, cmd)
+				assert.same({ cwd = "/tmp/data/packages/test" }, opts)
+				callback({ code = 0, stdout = "ok", stderr = "" })
 			end
 			commands.build({ { src = "test", data = { build = "make install" } } })
 			assert.same("Building test...", msgs[1][1])
+			assert.same(vim.log.levels.WARN, msgs[1][2])
 			assert.same("ok", msgs[2][1])
+			assert.same(vim.log.levels.INFO, msgs[2][2])
 		end)
 
 		it("skips if no build cmd", function()
@@ -57,17 +55,15 @@ describe("commands", function()
 			vim.uv.fs_stat = function()
 				return { type = "directory" }
 			end
-			vim.system = function()
-				return {
-					wait = function()
-						return { code = 1, stderr = "fail" }
-					end,
-				}
+			vim.notify = function(msg, level)
+				msgs[#msgs + 1] = { msg, level }
 			end
-			vim.notify = function(m, l)
-				msgs[#msgs + 1] = { m, l }
+			vim.system = function(_, _, callback)
+				callback({ code = 1, stderr = "fail", stdout = "" })
 			end
 			commands.build({ { src = "test", data = { build = "x" } } })
+			assert.same("Building test...", msgs[1][1])
+			assert.same(vim.log.levels.WARN, msgs[1][2])
 			assert.same("fail", msgs[2][1])
 			assert.same(vim.log.levels.ERROR, msgs[2][2])
 		end)
