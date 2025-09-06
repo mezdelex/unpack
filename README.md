@@ -62,7 +62,7 @@ This layer extends `vim.pack.Spec` to allow single file configurations.
 ---@field dependencies? UnPack.Spec[]
 ```
 
-It also leverages `PackChanged` event triggered by `vim.pack` internals to run plugin build hooks. The same `command` that is fired inside the event is provided as a standalone one. See `UnPack.Commands` section.
+It also leverages `PackChanged` event triggered by `vim.pack` internals to run plugin build hooks. The same `command` that is fired inside the event is provided as a standalone one. See `Commands` section.
 
 Example plugin spec setups under `/lua/plugins/`:
 
@@ -134,11 +134,15 @@ For example, if any of your plugins relies on `plenary` as a dependency, add it 
 
 The commands provided are:
 
-- PackBuild: iterates over all the plugin specs and runs all the build hooks. _(This command is triggered automatically on `PackChanged` event per changed package as well)_
-- PackClean: it removes any plugin present in your packages directory that doesn't exist as a plugin spec.
-- PackLoad: it loads all the plugins in your `plugins` directory. _(This command is executed when you enter Neovim; exposed just in case any of your builds times out and you need to reload)_
-- PackPull: updates UnPack to the latest version. _(This command also runs when you enter Neovim; calls `vim.fn.jobstart` to pull for changes)_
-- PackUpdate: it updates all the plugins present in your packages directory (already loaded).
+**PackBuild**: iterates over all the plugin specs and runs all the build hooks. _(This command is triggered automatically on `PackChanged` event per changed package as well)_
+
+**PackClean**: it removes any plugin present in your packages directory that doesn't exist as a plugin spec.
+
+**PackLoad**: it loads all the plugins in your `plugins` directory. _(This command is executed when you enter Neovim; exposed just in case any of your builds times out and you need to reload)_
+
+**PackPull**: updates UnPack to the latest version. _(This command also runs when you enter Neovim; calls `vim.system` asynchronously to pull for changes)_
+
+**PackUpdate**: it updates all the plugins present in your packages directory (already loaded).
 
 You can also use them this way if you prefer:
 
