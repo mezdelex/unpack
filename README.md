@@ -161,8 +161,8 @@ You can also use them this way if you prefer:
 - [x] UnPack auto update
 - [x] Tests
   - [x] commands
-  - [ ] config
-  - [ ] extensions
-  - [ ] unpack
+  - [x] config
+  - [x] extensions
+  - [x] unpack
 - [ ] Better error handling
 - [ ] Performance improvements

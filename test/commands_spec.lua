@@ -2,7 +2,7 @@
 local assert = require("luassert")
 local commands = require("lua.commands")
 
-_G.vim = require("test.fixtures").commands_fixtures
+_G.vim = require("test.fixtures").vim_commands_fixtures
 _G.string.is_empty_or_whitespace = function(s)
 	return not not s:match("^%s*$")
 end
@@ -159,7 +159,7 @@ describe("commands", function()
 		it("does nothing if unpack dir missing", function()
 			local called = false
 			vim.uv.fs_stat = function()
-				return nil
+				return {}
 			end
 			vim.fn.jobstart = function()
 				called = true
