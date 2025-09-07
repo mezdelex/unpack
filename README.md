@@ -170,5 +170,6 @@ You can also use them this way if you prefer:
   - [x] unpack
 - [x] Better error handling
 - [x] Performance improvements
-  - [x] Add dependabot
+- [x] Add dependabot
 - [x] Automated doc generation (panvimdoc)
+- [x] Enforce PR ruleset
