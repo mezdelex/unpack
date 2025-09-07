@@ -171,4 +171,4 @@ You can also use them this way if you prefer:
 - [x] Better error handling
 - [x] Performance improvements
   - [x] Add dependabot
-- [ ] Automated doc generation (panvimdoc)
+- [x] Automated doc generation (panvimdoc)
