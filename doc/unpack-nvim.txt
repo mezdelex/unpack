@@ -195,7 +195,8 @@ ROADMAP                                                  *unpack-nvim-roadmap*
 - ☒ Defer behavior
 - ☒ Simple dependency handling
 - ☒ Commands
-- ☒ UnPack auto update
+- ☒ Force pull UnPack auto updates
+    - ☒ Add helptags generation on pull
 - ☒ Tests
     - ☒ commands
     - ☒ config
