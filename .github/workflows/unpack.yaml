@@ -7,7 +7,7 @@ on:
     branches: [main, dev]
 
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,3 +32,33 @@ jobs:
           export PATH=$HOME/.luarocks/bin:$PATH
           export LUA_PATH="?.lua;?/init.lua;./lua/?.lua;./lua/?/init.lua;$HOME/.luarocks/share/lua/5.1/?.lua;$HOME/.luarocks/share/lua/5.1/?/init.lua;./lua_modules/?.lua;./lua_modules/?/init.lua;$LUA_PATH"
           nvim --headless -c "!busted --verbose ." -c "qa!"
+
+  docs:
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Clone panvimdoc
+        run: git clone https://github.com/kdheepak/panvimdoc.git ~/.local/share/panvimdoc
+
+      - name: Generate help doc
+        run: |
+          mkdir -p doc
+          pandoc --lua-filter ~/.local/share/panvimdoc/panvimdoc/panvimdoc.lua \
+            README.md -o doc/${{ github.event.repository.name }}.txt
+
+      - name: Commit and push docs
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add doc/
+          git commit -m "chore(docs): update help file"
+          git push
+        continue-on-error: true

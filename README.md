@@ -170,3 +170,4 @@ You can also use them this way if you prefer:
   - [x] unpack
 - [x] Better error handling
 - [x] Performance improvements
+- [ ] Automated doc generation (panvimdoc)
