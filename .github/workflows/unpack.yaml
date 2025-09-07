@@ -10,9 +10,25 @@ env:
   PANVIMDOC_COMMIT_MSG: "docs(panvimdoc): automated doc generation"
 
 jobs:
+  style:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'env.PANVIMDOC_COMMIT_MSG')
+    name: Run stylua check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Stylua
+        uses: JohnnyMorganz/stylua-action@v3
+        with:
+          args: --check .
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+
   tests:
     if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'env.PANVIMDOC_COMMIT_MSG')
     name: Run tests with busted
+    needs: style
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

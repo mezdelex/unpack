@@ -163,14 +163,16 @@ You can also use them this way if you prefer:
 - [x] Simple dependency handling
 - [x] Commands
 - [x] Force pull UnPack updates on setup
-  - [x] Add helptags generation on setup
-- [x] Tests
-  - [x] commands
-  - [x] config
-  - [x] extensions
-  - [x] unpack
+  - [x] Schedule helptags generation after pull
 - [x] Better error handling
 - [x] Performance improvements
+- [x] CI
+  - [x] Style check job (stylua)
+  - [x] Tests check job (busted)
+    - [x] commands
+    - [x] config
+    - [x] extensions
+    - [x] unpack
+  - [x] Doc generation job (panvimdoc)
 - [x] Add dependabot
-- [x] Automated doc generation (panvimdoc)
 - [x] Enforce PR ruleset

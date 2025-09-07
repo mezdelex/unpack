@@ -5,6 +5,16 @@ local function get_specs_and_names()
 	local plugin_fpaths = vim.fn.glob(config.opts.config_path .. config.opts.plugins_rpath .. "*.lua", true, true) ---@type string[]
 	local specs, names = {}, {} ---@type UnPack.Spec[], string[]
 
+
+
+
+
+
+
+
+
+
+
 	for _, plugin_fpath in ipairs(plugin_fpaths) do
 		local plugin_name = vim.fn.fnamemodify(plugin_fpath, ":t:r")
 		local success, spec = pcall(require, "plugins." .. plugin_name) ---@type boolean, UnPack.Spec
