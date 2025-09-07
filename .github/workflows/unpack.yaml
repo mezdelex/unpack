@@ -8,6 +8,7 @@ on:
 
 jobs:
   tests:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'Auto generate docs')
     name: Run tests with busted
     runs-on: ubuntu-latest
     steps:
@@ -30,6 +31,7 @@ jobs:
           nvim --headless -c "!busted --verbose ." -c "qa!"
 
   docs:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'Auto generate docs')
     name: Generate docs with panvimdoc
     needs: tests
     runs-on: ubuntu-latest
@@ -47,5 +49,5 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.PANVIMDOC }}@github.com/${{ github.repository }}.git
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          branch: ${{ github.ref_name }}
+          branch: ${{ github.head_ref || github.ref_name }}
           commit_message: "Auto generate docs"
