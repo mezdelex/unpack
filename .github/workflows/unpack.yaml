@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main, dev]
 
-permissions:
-  contents: write
-
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -38,9 +35,28 @@ jobs:
 
   docs:
     runs-on: ubuntu-latest
-    name: pandoc to vimdoc
+    name: pandoc to vimdoc and create PR
     steps:
       - uses: actions/checkout@v2
+
       - uses: kdheepak/panvimdoc@main
         with:
           vimdoc: ${{ github.event.repository.name }}-nvim
+
+      - name: Commit docs
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Auto generate docs"
+          branch: docs-update/${{ github.sha }}
+          push: true
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Auto generate docs"
+          branch: docs-update/${{ github.sha }}
+          title: "Auto-generated docs"
+          body: "This PR updates the vim docs automatically."
+          base: main
+          draft: false
