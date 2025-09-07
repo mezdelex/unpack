@@ -48,7 +48,7 @@ jobs:
         with:
           commit_message: "Auto generate docs"
           branch: docs-update/${{ github.sha }}
-          push: true
+          create_branch: true
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
@@ -59,4 +59,3 @@ jobs:
           title: "Auto-generated docs"
           body: "This PR updates the vim docs automatically."
           base: main
-          draft: false
