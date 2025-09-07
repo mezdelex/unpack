@@ -163,11 +163,14 @@ describe("commands", function()
 
 			commands.pull()
 
-			assert.same({ "git", "reset", "--hard", "HEAD" }, calls[1].cmd)
+			assert.same({ "git", "fetch", "--all" }, calls[1].cmd)
 			assert.same({ cwd = "/tmp/data/unpack/" }, calls[1].opts)
 
-			assert.same({ "git", "pull", "--force" }, calls[2].cmd)
+			assert.same({ "git", "reset", "--hard", "origin/main" }, calls[2].cmd)
 			assert.same({ cwd = "/tmp/data/unpack/" }, calls[2].opts)
+
+			assert.same({ "git", "clean", "-fdx" }, calls[3].cmd)
+			assert.same({ cwd = "/tmp/data/unpack/" }, calls[3].opts)
 		end)
 
 		it("does nothing if unpack dir missing", function()
