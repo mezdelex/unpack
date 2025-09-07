@@ -7,11 +7,11 @@ on:
     branches: [dev, main]
 
 env:
-  PANVIMDOC_COMMIT_MSG: "panvimdoc automated doc generation"
+  PANVIMDOC_COMMIT_MSG: "docs(panvimdoc): automated doc generation"
 
 jobs:
   tests:
-    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, env.PANVIMDOC_COMMIT_MSG)
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'env.PANVIMDOC_COMMIT_MSG')
     name: Run tests with busted
     runs-on: ubuntu-latest
     steps:
@@ -38,7 +38,7 @@ jobs:
           nvim --headless -c "!busted --verbose ." -c "qa!"
 
   docs:
-    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, env.PANVIMDOC_COMMIT_MSG)
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'env.PANVIMDOC_COMMIT_MSG')
     name: Generate docs with panvimdoc
     needs: tests
     runs-on: ubuntu-latest
