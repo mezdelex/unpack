@@ -44,7 +44,7 @@ jobs:
       - uses: kdheepak/panvimdoc@main
         with:
           vimdoc: ${{ github.event.repository.name }}-nvim
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "Auto generate docs"
           branch: ${{ github.ref_name }}
