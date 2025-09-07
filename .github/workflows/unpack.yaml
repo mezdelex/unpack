@@ -42,4 +42,4 @@ jobs:
         with:
           branch: ${{ github.ref_name }}
           commit_message: "Auto generate docs"
-          github_token: ${{ secrets.PANVIMDOC }}
+          token: ${{ secrets.PANVIMDOC }}
