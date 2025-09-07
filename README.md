@@ -169,4 +169,4 @@ You can also use them this way if you prefer:
   - [x] extensions
   - [x] unpack
 - [x] Better error handling
-- [ ] Performance improvements
+- [x] Performance improvements

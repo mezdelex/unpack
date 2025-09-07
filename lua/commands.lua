@@ -75,14 +75,16 @@ local function handle_build(spec)
 
 	vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
 	vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }, function(response)
-		vim.notify(
-			vim.trim(
-				response.stderr and not response.stderr:is_empty_or_whitespace() and response.stderr
-					or response.stdout and not response.stdout:is_empty_or_whitespace() and response.stdout
-					or ("Exit code: %d"):format(response.code)
-			),
-			response.code ~= 0 and vim.log.levels.ERROR or vim.log.levels.INFO
-		)
+		vim.schedule(function()
+			vim.notify(
+				vim.trim(
+					response.stderr and not response.stderr:is_empty_or_whitespace() and response.stderr
+						or response.stdout and not response.stdout:is_empty_or_whitespace() and response.stdout
+						or ("Exit code: %d"):format(response.code)
+				),
+				response.code ~= 0 and vim.log.levels.ERROR or vim.log.levels.INFO
+			)
+		end)
 	end)
 end
 
@@ -138,7 +140,7 @@ M.pull = function()
 
 	if stat and stat.type == "directory" then
 		vim.system({ "git", "reset", "--hard", "HEAD" }, { cwd = unpack_fpath }, function()
-			vim.system({ "git", "pull", "--force" }, { cwd = unpack_fpath }, function() end)
+			vim.system({ "git", "pull", "--force" }, { cwd = unpack_fpath })
 		end)
 	end
 end
