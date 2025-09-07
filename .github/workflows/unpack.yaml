@@ -6,12 +6,9 @@ on:
   push:
     branches: [dev, main]
 
-env:
-  PANVIMDOC_COMMIT_MSG: "docs(panvimdoc): automated doc generation"
-
 jobs:
   tests:
-    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, env.PANVIMDOC_COMMIT_MSG)
+    if: 'github.actor != "github-actions[bot]" && !contains(github.event.head_commit.message, "docs(panvimdoc): automated doc generation")'
     name: Run tests with busted
     runs-on: ubuntu-latest
     steps:
@@ -38,7 +35,7 @@ jobs:
           nvim --headless -c "!busted --verbose ." -c "qa!"
 
   docs:
-    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, env.PANVIMDOC_COMMIT_MSG)
+    if: 'github.actor != "github-actions[bot]" && !contains(github.event.head_commit.message, "docs(panvimdoc): automated doc generation")'
     name: Generate docs with panvimdoc
     needs: tests
     runs-on: ubuntu-latest
@@ -60,4 +57,4 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: ${{ github.head_ref || github.ref_name }}
-          commit_message: ${{ env.PANVIMDOC_COMMIT_MSG }}
+          commit_message: "docs(panvimdoc): automated doc generation"
