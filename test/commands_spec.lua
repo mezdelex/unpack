@@ -33,11 +33,16 @@ describe("commands", function()
 				assert.same({ "make", "install" }, cmd)
 				assert.same({ cwd = "/tmp/data/packages/test" }, opts)
 				callback({ code = 0, stdout = "ok", stderr = "" })
+				return {
+					wait = function()
+						return 0
+					end,
+				}
 			end
 			commands.build({ { src = "test", data = { build = "make install" } } })
 			assert.same("Building test...", msgs[1][1])
 			assert.same(vim.log.levels.WARN, msgs[1][2])
-			assert.same("ok", msgs[2][1])
+			assert.same("Build successful for test", msgs[2][1]) -- changed
 			assert.same(vim.log.levels.INFO, msgs[2][2])
 		end)
 
@@ -60,11 +65,16 @@ describe("commands", function()
 			end
 			vim.system = function(_, _, callback)
 				callback({ code = 1, stderr = "fail", stdout = "" })
+				return {
+					wait = function()
+						return 1
+					end,
+				}
 			end
 			commands.build({ { src = "test", data = { build = "x" } } })
 			assert.same("Building test...", msgs[1][1])
 			assert.same(vim.log.levels.WARN, msgs[1][2])
-			assert.same("fail", msgs[2][1])
+			assert.same("Build failed for test", msgs[2][1])
 			assert.same(vim.log.levels.ERROR, msgs[2][2])
 		end)
 	end)
