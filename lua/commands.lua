@@ -137,7 +137,11 @@ M.pull = function()
 	if stat and stat.type == "directory" then
 		vim.system({ "git", "fetch", "--all" }, { cwd = unpack_fpath }, function()
 			vim.system({ "git", "reset", "--hard", "origin/main" }, { cwd = unpack_fpath }, function()
-				vim.system({ "git", "clean", "-fdx" }, { cwd = unpack_fpath })
+				vim.system({ "git", "clean", "-fdx" }, { cwd = unpack_fpath }, function()
+					vim.schedule(function()
+						vim.cmd(("helptags %s/doc"):format(unpack_fpath))
+					end)
+				end)
 			end)
 		end)
 	end

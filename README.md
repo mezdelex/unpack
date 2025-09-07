@@ -162,7 +162,8 @@ You can also use them this way if you prefer:
 - [x] Defer behavior
 - [x] Simple dependency handling
 - [x] Commands
-- [x] UnPack auto update
+- [x] Force pull UnPack auto updates
+  - [x] Add helptags generation on pull
 - [x] Tests
   - [x] commands
   - [x] config
