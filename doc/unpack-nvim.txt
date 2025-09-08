@@ -169,14 +169,13 @@ The commands provided are:
   PackClean    Removes any plugin present in your packages directory that
                doesn’t exist as a plugin spec.
 
-  PackLoad     Loads all the plugins in your plugins directory. (Executed on
-               Neovim entry; exposed for build timeouts)
+  PackLoad     Loads all the plugins in your plugins directory. (Runs on
+               VimEnter; exposed for build timeouts)
 
-  PackPull     Updates UnPack to the latest version. (Runs on Neovim entry;
-               calls vim.system asynchronously to pull changes)
+  PackPull     Updates UnPack to the latest version. (Runs on VimEnter; calls
+               vim.system asynchronously to pull changes)
 
-  PackUpdate   Updates all the plugins present in your packages directory
-               (already loaded).
+  PackUpdate   Updates all the plugins present in your packages directory.
   ------------------------------------------------------------------------------
 You can also use them this way if you prefer:
 
@@ -192,7 +191,7 @@ You can also use them this way if you prefer:
 
 
   [!NOTE]
-  All the notifications are wrapper in a `vim.schedule` call to avoid command
+  All the notifications are wrapped in a `vim.schedule` call to avoid command
   line overflow. If you want to see the recap after executing any command, use
   `:messages`.
 
