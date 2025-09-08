@@ -132,6 +132,11 @@ For example, if any of your plugins relies on `plenary` as a dependency, add it 
 
 ## Commands
 
+> [!NOTE]
+>
+> All the notifications are wrapped in a `vim.schedule` call to avoid command line overflow.
+> If you want to see the recap after executing any command, use `:messages`.
+
 The commands provided are:
 
 | Command      | Description                                                                                                                             |
@@ -153,11 +158,6 @@ You can also use them this way if you prefer:
     vim.keymap.set("n", "<your-keymap>", commands.pull)
     vim.keymap.set("n", "<your-keymap>", commands.update)
 ```
-
-> [!NOTE]
->
-> All the notifications are wrapped in a `vim.schedule` call to avoid command line overflow.
-> If you want to see the recap after executing any command, use `:messages`.
 
 ## Roadmap
 
