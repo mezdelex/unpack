@@ -10,9 +10,13 @@ local function get_specs_and_names()
 		local success, spec = pcall(require, "plugins." .. plugin_name) ---@type boolean, UnPack.Spec
 
 		if not success then
-			vim.notify(("Failed to load plugin spec for %s"):format(plugin_name), vim.log.levels.ERROR)
+			vim.schedule(function()
+				vim.notify(("Failed to load plugin spec for %s"):format(plugin_name), vim.log.levels.ERROR)
+			end)
 		elseif type(spec) ~= "table" then
-			vim.notify(("Invalid spec for %s, not a table"):format(plugin_name), vim.log.levels.ERROR)
+			vim.schedule(function()
+				vim.notify(("Invalid spec for %s, not a table"):format(plugin_name), vim.log.levels.ERROR)
+			end)
 		else
 			if spec.dependencies and type(spec.dependencies) == "table" then
 				for _, dep in ipairs(spec.dependencies) do
@@ -20,7 +24,12 @@ local function get_specs_and_names()
 						specs[#specs + 1] = dep
 						names[#names + 1] = vim.fn.fnamemodify(dep.src, ":t")
 					else
-						vim.notify(("Invalid dependency for %s, missing src"):format(plugin_name), vim.log.levels.ERROR)
+						vim.schedule(function()
+							vim.notify(
+								("Invalid dependency for %s, missing src"):format(plugin_name),
+								vim.log.levels.ERROR
+							)
+						end)
 					end
 				end
 			end
@@ -28,7 +37,9 @@ local function get_specs_and_names()
 				specs[#specs + 1] = spec
 				names[#names + 1] = vim.fn.fnamemodify(spec.src, ":t")
 			else
-				vim.notify(("Invalid spec for %s, missing src"):format(plugin_name), vim.log.levels.ERROR)
+				vim.schedule(function()
+					vim.notify(("Invalid spec for %s, missing src"):format(plugin_name), vim.log.levels.ERROR)
+				end)
 			end
 		end
 	end
@@ -73,7 +84,9 @@ local function handle_build(spec)
 		return
 	end
 
-	vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
+	vim.schedule(function()
+		vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
+	end)
 	vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }, function(response)
 		vim.schedule(function()
 			vim.notify(
