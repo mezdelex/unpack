@@ -159,23 +159,25 @@ COMMANDS                                                *unpack-nvim-commands*
 
 The commands provided are:
 
-**PackBuild**: iterates over all the plugin specs and runs all the build hooks.
-_(This command is triggered automatically on PackChanged event per changed
-package as well)_
+  ------------------------------------------------------------------------------
+  Command      Description
+  ------------ -----------------------------------------------------------------
+  PackBuild    Iterates over all the plugin specs and runs all the build hooks.
+               (Triggered automatically on PackChanged event per changed
+               package)
 
-**PackClean**: it removes any plugin present in your packages directory that
-doesn’t exist as a plugin spec.
+  PackClean    Removes any plugin present in your packages directory that
+               doesn’t exist as a plugin spec.
 
-**PackLoad**: it loads all the plugins in your `plugins` directory. _(This
-command is executed when you enter Neovim; exposed just in case any of your
-builds times out and you need to reload)_
+  PackLoad     Loads all the plugins in your plugins directory. (Executed on
+               Neovim entry; exposed for build timeouts)
 
-**PackPull**: updates UnPack to the latest version. _(This command also runs
-when you enter Neovim; calls vim.system asynchronously to pull for changes)_
+  PackPull     Updates UnPack to the latest version. (Runs on Neovim entry;
+               calls vim.system asynchronously to pull changes)
 
-**PackUpdate**: it updates all the plugins present in your packages directory
-(already loaded).
-
+  PackUpdate   Updates all the plugins present in your packages directory
+               (already loaded).
+  ------------------------------------------------------------------------------
 You can also use them this way if you prefer:
 
 >lua
@@ -188,6 +190,11 @@ You can also use them this way if you prefer:
         vim.keymap.set("n", "<your-keymap>", commands.update)
 <
 
+
+  [!NOTE]
+  All the notifications are wrapper in a `vim.schedule` call to avoid command
+  line overflow. If you want to see the recap after executing any command, use
+  `:messages`.
 
 ROADMAP                                                  *unpack-nvim-roadmap*
 
