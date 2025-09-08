@@ -157,6 +157,11 @@ order, and that’s pretty much it.
 
 COMMANDS                                                *unpack-nvim-commands*
 
+
+  [!NOTE]
+  All the notifications are wrapped in a `vim.schedule` call to avoid command
+  line overflow. If you want to see the recap after executing any command, use
+  `:messages`.
 The commands provided are:
 
   ------------------------------------------------------------------------------
@@ -189,11 +194,6 @@ You can also use them this way if you prefer:
         vim.keymap.set("n", "<your-keymap>", commands.update)
 <
 
-
-  [!NOTE]
-  All the notifications are wrapped in a `vim.schedule` call to avoid command
-  line overflow. If you want to see the recap after executing any command, use
-  `:messages`.
 
 ROADMAP                                                  *unpack-nvim-roadmap*
 
