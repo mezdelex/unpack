@@ -134,15 +134,13 @@ For example, if any of your plugins relies on `plenary` as a dependency, add it 
 
 The commands provided are:
 
-**PackBuild**: iterates over all the plugin specs and runs all the build hooks. _(This command is triggered automatically on `PackChanged` event per changed package as well)_
-
-**PackClean**: it removes any plugin present in your packages directory that doesn't exist as a plugin spec.
-
-**PackLoad**: it loads all the plugins in your `plugins` directory. _(This command is executed when you enter Neovim; exposed just in case any of your builds times out and you need to reload)_
-
-**PackPull**: updates UnPack to the latest version. _(This command also runs when you enter Neovim; calls `vim.system` asynchronously to pull for changes)_
-
-**PackUpdate**: it updates all the plugins present in your packages directory (already loaded).
+| Command      | Description                                                                                                                             |
+| :----------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| `PackBuild`  | Iterates over all the plugin specs and runs all the build hooks. _(Triggered automatically on `PackChanged` event per changed package)_ |
+| `PackClean`  | Removes any plugin present in your packages directory that doesn't exist as a plugin spec.                                              |
+| `PackLoad`   | Loads all the plugins in your `plugins` directory. _(Runs on `VimEnter`; exposed for build timeouts)_                                   |
+| `PackPull`   | Updates _UnPack_ to the latest version. _(Runs on `VimEnter`; calls `vim.system` asynchronously to pull changes)_                       |
+| `PackUpdate` | Updates all the plugins present in your packages directory.                                                                             |
 
 You can also use them this way if you prefer:
 
@@ -155,6 +153,11 @@ You can also use them this way if you prefer:
     vim.keymap.set("n", "<your-keymap>", commands.pull)
     vim.keymap.set("n", "<your-keymap>", commands.update)
 ```
+
+> [!NOTE]
+>
+> All the notifications are wrapped in a `vim.schedule` call to avoid command line overflow.
+> If you want to see the recap after executing any command, use `:messages`.
 
 ## Roadmap
 
