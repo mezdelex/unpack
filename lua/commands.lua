@@ -86,15 +86,12 @@ local function handle_build(spec)
 
 	vim.schedule(function()
 		vim.notify(("Building %s..."):format(package_name), vim.log.levels.WARN)
+		local response = vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }):wait()
+		vim.notify(
+			("Build %s for %s"):format(response.code ~= 0 and "failed" or "successful", package_name),
+			response.code ~= 0 and vim.log.levels.ERROR or vim.log.levels.INFO
+		)
 	end)
-	vim.system(vim.split(spec.data.build, " "), { cwd = package_fpath }, function(response)
-		vim.schedule(function()
-			vim.notify(
-				("Build %s for %s"):format(response.code ~= 0 and "failed" or "successful", package_name),
-				response.code ~= 0 and vim.log.levels.ERROR or vim.log.levels.INFO
-			)
-		end)
-	end):wait()
 end
 
 local M = {} ---@class UnPack.Commands

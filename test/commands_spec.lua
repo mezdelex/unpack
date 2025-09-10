@@ -13,13 +13,25 @@ package.loaded["config"] = {
 		plugins_rpath = "plugins/",
 		data_path = "/tmp/data/",
 		packages_rpath = "packages/",
-		unpack_rpath = "unpack/",
+		unpack_rpath = "unpack",
 		add_options = {},
 		update_options = {},
 	},
 }
 
 describe("commands", function()
+	local original_vim_schedule = vim.schedule
+
+	before_each(function()
+		vim.schedule = function(func)
+			func()
+		end
+	end)
+
+	after_each(function()
+		vim.schedule = original_vim_schedule
+	end)
+
 	describe("build", function()
 		it("runs build command", function()
 			local msgs = {}
@@ -29,20 +41,19 @@ describe("commands", function()
 			vim.notify = function(msg, level)
 				msgs[#msgs + 1] = { msg, level }
 			end
-			vim.system = function(cmd, opts, callback)
+			vim.system = function(cmd, opts)
 				assert.same({ "make", "install" }, cmd)
 				assert.same({ cwd = "/tmp/data/packages/test" }, opts)
-				callback({ code = 0, stdout = "ok", stderr = "" })
 				return {
 					wait = function()
-						return 0
+						return { code = 0, stdout = "ok", stderr = "" }
 					end,
 				}
 			end
 			commands.build({ { src = "test", data = { build = "make install" } } })
 			assert.same("Building test...", msgs[1][1])
 			assert.same(vim.log.levels.WARN, msgs[1][2])
-			assert.same("Build successful for test", msgs[2][1]) -- changed
+			assert.same("Build successful for test", msgs[2][1])
 			assert.same(vim.log.levels.INFO, msgs[2][2])
 		end)
 
@@ -63,11 +74,10 @@ describe("commands", function()
 			vim.notify = function(msg, level)
 				msgs[#msgs + 1] = { msg, level }
 			end
-			vim.system = function(_, _, callback)
-				callback({ code = 1, stderr = "fail", stdout = "" })
+			vim.system = function(_, _)
 				return {
 					wait = function()
-						return 1
+						return { code = 1, stderr = "fail", stdout = "" }
 					end,
 				}
 			end
@@ -151,6 +161,7 @@ describe("commands", function()
 	describe("pull", function()
 		it("pulls if unpack dir exists", function()
 			local calls = {}
+			local cmd_called_with
 			vim.uv.fs_stat = function()
 				return { type = "directory" }
 			end
@@ -160,17 +171,22 @@ describe("commands", function()
 					cb()
 				end
 			end
+			vim.cmd = function(cmd_str)
+				cmd_called_with = cmd_str
+			end
 
 			commands.pull()
 
 			assert.same({ "git", "fetch", "--all" }, calls[1].cmd)
-			assert.same({ cwd = "/tmp/data/unpack/" }, calls[1].opts)
+			assert.same({ cwd = "/tmp/data/unpack" }, calls[1].opts)
 
 			assert.same({ "git", "reset", "--hard", "origin/main" }, calls[2].cmd)
-			assert.same({ cwd = "/tmp/data/unpack/" }, calls[2].opts)
+			assert.same({ cwd = "/tmp/data/unpack" }, calls[2].opts)
 
 			assert.same({ "git", "clean", "-fdx" }, calls[3].cmd)
-			assert.same({ cwd = "/tmp/data/unpack/" }, calls[3].opts)
+			assert.same({ cwd = "/tmp/data/unpack" }, calls[3].opts)
+
+			assert.same("helptags /tmp/data/unpack/doc", cmd_called_with)
 		end)
 
 		it("does nothing if unpack dir missing", function()
