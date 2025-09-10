@@ -1,4 +1,4 @@
----@diagnostic disable: duplicate-set-field
+---@diagnostic disable: duplicate-set-field, missing-parameter
 local assert = require("luassert")
 local commands = require("lua.commands")
 
@@ -192,7 +192,7 @@ describe("commands", function()
 		it("does nothing if unpack dir missing", function()
 			local called = false
 			vim.uv.fs_stat = function()
-				return nil
+				return {}
 			end
 			vim.system = function()
 				called = true
